@@ -13,6 +13,7 @@ class OrderResponse(BaseModel):
     produto_id: int
     quantidade: int
     total: float
+    status: str
 
     class Config:
         from_attributes = True

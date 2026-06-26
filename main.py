@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from app.database.database import (
@@ -7,29 +8,39 @@ from app.database.database import (
     get_db
 )
 
-#importações para usuários
+# ==========================
+# Models
+# ==========================
 from app.models.user import User
+from app.models.product import Product
+from app.models.order import Order
 
+# ==========================
+# Schemas
+# ==========================
 from app.schemas.user_schema import (
     UserCreate,
     UserResponse,
-    LoginRequest,
     TokenResponse
 )
 
+from app.schemas.product_schema import (
+    ProductCreate,
+    ProductResponse
+)
+
+from app.schemas.order_schema import (
+    OrderCreate,
+    OrderResponse
+)
+
+# ==========================
+# CRUD
+# ==========================
 from app.crud.user_crud import (
     create_user,
     get_users,
     login_user
-)
-
-from app.services.security import get_current_user
-
-#importações para produtos
-from app.models.product import Product
-from app.schemas.product_schema import (
-    ProductCreate,
-    ProductResponse
 )
 
 from app.crud.product_crud import (
@@ -40,20 +51,21 @@ from app.crud.product_crud import (
     delete_product
 )
 
-from app.services.security import get_current_admin
-
-#importações para pedidos
-from app.models.order import Order
-from app.schemas.order_schema import (
-    OrderCreate,
-    OrderResponse
-)
-
 from app.crud.order_crud import (
     create_order,
     get_orders,
-    get_order_by_id
+    get_order_by_id,
+    pay_order
 )
+
+# ==========================
+# Security
+# ==========================
+from app.services.security import (
+    get_current_user,
+    get_current_admin
+)
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -62,6 +74,9 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# ======================================================
+# HOME
+# ======================================================
 
 @app.get("/")
 def home():
@@ -69,6 +84,10 @@ def home():
         "message": "API Raízes do Nordeste funcionando"
     }
 
+
+# ======================================================
+# USUÁRIOS / AUTENTICAÇÃO
+# ======================================================
 
 @app.post(
     "/users",
@@ -96,19 +115,19 @@ def list_users(
 ):
     return get_users(db)
 
+
 @app.post(
     "/login",
     response_model=TokenResponse
 )
 def login(
-    user: LoginRequest,
+    form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
-
     result = login_user(
         db,
-        user.email,
-        user.senha
+        form_data.username,
+        form_data.password
     )
 
     if not result:
@@ -119,6 +138,10 @@ def login(
 
     return result
 
+
+# ======================================================
+# PRODUTOS
+# ======================================================
 
 @app.post(
     "/products",
@@ -136,18 +159,6 @@ def create_new_product(
         product.preco
     )
 
-@app.post("/orders")
-def create_new_order(
-    order: OrderCreate,
-    db: Session = Depends(get_db),
-    current_user: str = Depends(get_current_user)
-):
-    return create_order(
-        db,
-        order.usuario_id,
-        order.produto_id,
-        order.quantidade
-    )
 
 @app.get(
     "/products",
@@ -157,10 +168,7 @@ def list_products(
     db: Session = Depends(get_db)
 ):
     return get_products(db)
-def list_products(
-    db: Session = Depends(get_db)
-):
-    return get_products(db)
+
 
 @app.get(
     "/products/{product_id}",
@@ -174,6 +182,7 @@ def get_product(
         db,
         product_id
     )
+
 
 @app.put(
     "/products/{product_id}",
@@ -193,6 +202,7 @@ def edit_product(
         product.preco
     )
 
+
 @app.delete("/products/{product_id}")
 def remove_product(
     product_id: int,
@@ -204,15 +214,20 @@ def remove_product(
         product_id
     )
 
+
+# ======================================================
+# PEDIDOS
+# ======================================================
+
 @app.post(
     "/orders",
     response_model=OrderResponse
 )
 def create_new_order(
     order: OrderCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
 ):
-
     return create_order(
         db,
         order.usuario_id,
@@ -228,7 +243,6 @@ def create_new_order(
 def list_orders(
     db: Session = Depends(get_db)
 ):
-
     return get_orders(db)
 
 
@@ -240,8 +254,23 @@ def get_order(
     order_id: int,
     db: Session = Depends(get_db)
 ):
-
     return get_order_by_id(
         db,
         order_id
     )
+
+
+@app.put(
+    "/orders/{order_id}/pay",
+    response_model=OrderResponse
+)
+def payment_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user)
+):
+    return pay_order(
+        db,
+        order_id
+    )
+    

@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.models.order import Order
 from app.models.product import Product
-
+from fastapi import HTTPException
 
 def create_order(
     db: Session,
@@ -26,7 +26,8 @@ def create_order(
         usuario_id=usuario_id,
         produto_id=produto_id,
         quantidade=quantidade,
-        total=total
+        total=total,
+        status="PENDENTE"
     )
 
     db.add(order)
@@ -49,3 +50,27 @@ def get_order_by_id(
         .filter(Order.id == order_id)
         .first()
     )
+    
+
+def pay_order(
+    db: Session,
+    order_id: int
+):
+    order = (
+        db.query(Order)
+        .filter(Order.id == order_id)
+        .first()
+    )
+
+    if not order:
+        raise HTTPException(
+            status_code=404,
+            detail="Pedido não encontrado"
+        )
+
+    order.status = "PAGO"
+
+    db.commit()
+    db.refresh(order)
+
+    return order
