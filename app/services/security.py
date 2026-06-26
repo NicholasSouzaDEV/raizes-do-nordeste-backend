@@ -17,9 +17,7 @@ ALGORITHM = "HS256"
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="login"
-)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
 def hash_password(password: str):
@@ -59,14 +57,7 @@ def create_access_token(data: dict):
 def get_current_user(
     token: str = Depends(oauth2_scheme)
 ):
-
-    credentials_exception = HTTPException(
-        status_code=401,
-        detail="Token inválido"
-    )
-
     try:
-
         payload = jwt.decode(
             token,
             SECRET_KEY,
@@ -74,11 +65,32 @@ def get_current_user(
         )
 
         email = payload.get("sub")
+        perfil = payload.get("perfil")
 
         if email is None:
-            raise credentials_exception
+            raise HTTPException(
+                status_code=401,
+                detail="Token inválido"
+            )
 
-        return email
+        return {
+            "email": email,
+            "perfil": perfil
+        }
 
     except JWTError:
-        raise credentials_exception
+        raise HTTPException(
+            status_code=401,
+            detail="Token inválido"
+        )
+        
+def get_current_admin(
+    current_user: dict = Depends(get_current_user)
+):
+    if current_user["perfil"] != "ADMIN":
+        raise HTTPException(
+            status_code=403,
+            detail="Apenas administradores podem acessar este recurso."
+        )
+
+    return current_user

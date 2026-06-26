@@ -40,6 +40,8 @@ from app.crud.product_crud import (
     delete_product
 )
 
+from app.services.security import get_current_admin
+
 #importações para pedidos
 from app.models.order import Order
 from app.schemas.order_schema import (
@@ -80,7 +82,8 @@ def create_new_user(
         db,
         user.nome,
         user.email,
-        user.senha
+        user.senha,
+        user.perfil
     )
 
 
@@ -124,7 +127,7 @@ def login(
 def create_new_product(
     product: ProductCreate,
     db: Session = Depends(get_db),
-    current_user: str = Depends(get_current_user)
+    current_user: dict = Depends(get_current_admin)
 ):
     return create_product(
         db,
@@ -179,7 +182,8 @@ def get_product(
 def edit_product(
     product_id: int,
     product: ProductCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_admin)
 ):
     return update_product(
         db,
@@ -192,7 +196,8 @@ def edit_product(
 @app.delete("/products/{product_id}")
 def remove_product(
     product_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_admin)
 ):
     return delete_product(
         db,

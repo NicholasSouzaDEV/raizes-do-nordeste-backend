@@ -8,13 +8,20 @@ from app.services.security import (
 )
 
 
-def create_user(db: Session, nome: str, email: str, senha: str):
+def create_user(
+    db: Session,
+    nome: str,
+    email: str,
+    senha: str,
+    perfil: str
+):
 
     user = User(
-        nome=nome,
-        email=email,
-        senha=hash_password(senha)
-    )
+    nome=nome,
+    email=email,
+    senha=hash_password(senha),
+    perfil=perfil
+)
 
     db.add(user)
     db.commit()
@@ -49,10 +56,11 @@ def login_user(
         return None
 
     token = create_access_token(
-        {
-            "sub": user.email
-        }
-    )
+    {
+        "sub": user.email,
+        "perfil": user.perfil
+    }
+)
 
     return {
         "access_token": token,
