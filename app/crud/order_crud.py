@@ -77,7 +77,8 @@ def get_order_by_id(
 
 def pay_order(
     db: Session,
-    order_id: int
+    order_id: int,
+    aprovado: bool = True
 ):
     order = (
         db.query(Order)
@@ -91,7 +92,10 @@ def pay_order(
             detail="Pedido não encontrado"
         )
 
-    order.status = "PAGO"
+    if aprovado:
+        order.status = "PAGO"
+    else:
+        order.status = "RECUSADO"
 
     db.commit()
     db.refresh(order)

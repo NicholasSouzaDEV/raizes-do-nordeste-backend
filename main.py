@@ -271,11 +271,13 @@ def get_order(
 )
 def payment_order(
     order_id: int,
+    aprovado: bool = True,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ):
     return pay_order(
         db,
-        order_id
+        order_id,
+        aprovado
     )
     
