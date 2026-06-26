@@ -229,11 +229,12 @@ def create_new_order(
     current_user: dict = Depends(get_current_user)
 ):
     return create_order(
-        db,
-        order.usuario_id,
-        order.produto_id,
-        order.quantidade
-    )
+    db,
+    order.usuario_id,
+    order.produto_id,
+    order.quantidade,
+    order.canalPedido
+)
 
 
 @app.get(
@@ -241,9 +242,13 @@ def create_new_order(
     response_model=list[OrderResponse]
 )
 def list_orders(
+    canalPedido: str | None = None,
     db: Session = Depends(get_db)
 ):
-    return get_orders(db)
+    return get_orders(
+        db,
+        canalPedido
+    )
 
 
 @app.get(

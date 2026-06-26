@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, ForeignKey, String
+from sqlalchemy import Column, Integer, Float, String
 
 from app.database.database import Base
 
@@ -13,4 +13,9 @@ class Order(Base):
     total = Column(Float)
 
     status = Column(String(20), default="PENDENTE")
-    
+
+    canal_pedido = Column(String(20), nullable=False, default="WEB")
+
+    @property
+    def canalPedido(self):
+        return self.canal_pedido
