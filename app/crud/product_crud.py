@@ -1,7 +1,12 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
+import logging
 
 from app.models.product import Product
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def create_product(
@@ -20,10 +25,19 @@ def create_product(
     db.commit()
     db.refresh(product)
 
+    logger.info(
+        f"Produto criado com sucesso. "
+        f"produto_id={product.id}, "
+        f"nome={product.nome}, "
+        f"preco={product.preco}"
+    )
+
     return product
 
 
 def get_products(db: Session):
+    logger.info("Consulta de lista de produtos realizada.")
+
     return db.query(Product).all()
 
 
@@ -38,10 +52,18 @@ def get_product_by_id(
     )
 
     if not product:
+        logger.warning(
+            f"Tentativa de consultar produto inexistente. produto_id={product_id}"
+        )
+
         raise HTTPException(
             status_code=404,
             detail="Produto não encontrado"
         )
+
+    logger.info(
+        f"Produto consultado com sucesso. produto_id={product_id}"
+    )
 
     return product
 
@@ -60,6 +82,10 @@ def update_product(
     )
 
     if not product:
+        logger.warning(
+            f"Tentativa de atualizar produto inexistente. produto_id={product_id}"
+        )
+
         raise HTTPException(
             status_code=404,
             detail="Produto não encontrado"
@@ -71,6 +97,13 @@ def update_product(
 
     db.commit()
     db.refresh(product)
+
+    logger.info(
+        f"Produto atualizado com sucesso. "
+        f"produto_id={product.id}, "
+        f"nome={product.nome}, "
+        f"preco={product.preco}"
+    )
 
     return product
 
@@ -86,6 +119,10 @@ def delete_product(
     )
 
     if not product:
+        logger.warning(
+            f"Tentativa de remover produto inexistente. produto_id={product_id}"
+        )
+
         raise HTTPException(
             status_code=404,
             detail="Produto não encontrado"
@@ -93,6 +130,10 @@ def delete_product(
 
     db.delete(product)
     db.commit()
+
+    logger.info(
+        f"Produto removido com sucesso. produto_id={product_id}"
+    )
 
     return {
         "message": "Produto removido com sucesso"
