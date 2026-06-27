@@ -1,286 +1,265 @@
 {
-"info": {
-"name": "Raízes do Nordeste API",
-"description": "Coleção de testes da API Raízes do Nordeste, incluindo autenticação, usuários, produtos, pedidos, canalPedido e pagamento mock.",
-"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-},
-"variable": [
-{
-"key": "base_url",
-"value": "http://127.0.0.1:8000"
-},
-{
-"key": "token",
-"value": ""
-}
-],
-"item": [
-{
-"name": "Home",
-"request": {
-"method": "GET",
-"url": "{{base_url}}/"
-}
-},
-{
-"name": "Criar usuário",
-"request": {
-"method": "POST",
-"header": [
-{
-"key": "Content-Type",
-"value": "application/json"
-}
-],
-"body": {
-"mode": "raw",
-"raw": "{\n  "nome": "Usuario Teste",\n  "email": "[teste@email.com](mailto:teste@email.com)",\n  "senha": "123456",\n  "perfil": "CLIENTE"\n}"
-},
-"url": "{{base_url}}/users"
-}
-},
-{
-"name": "Login",
-"request": {
-"method": "POST",
-"header": [
-{
-"key": "Content-Type",
-"value": "application/x-www-form-urlencoded"
-}
-],
-"body": {
-"mode": "urlencoded",
-"urlencoded": [
-{
-"key": "username",
-"value": "[teste@email.com](mailto:teste@email.com)",
-"type": "text"
-},
-{
-"key": "password",
-"value": "123456",
-"type": "text"
-}
-]
-},
-"url": "{{base_url}}/login"
-}
-},
-{
-"name": "Listar usuários",
-"request": {
-"method": "GET",
-"url": "{{base_url}}/users"
-}
-},
-{
-"name": "Criar produto",
-"request": {
-"method": "POST",
-"auth": {
-"type": "bearer",
-"bearer": [
-{
-"key": "token",
-"value": "{{token}}",
-"type": "string"
-}
-]
-},
-"header": [
-{
-"key": "Content-Type",
-"value": "application/json"
-}
-],
-"body": {
-"mode": "raw",
-"raw": "{\n  "nome": "Bolo de Rolo",\n  "descricao": "Produto típico nordestino",\n  "preco": 25.0\n}"
-},
-"url": "{{base_url}}/products"
-}
-},
-{
-"name": "Listar produtos",
-"request": {
-"method": "GET",
-"url": "{{base_url}}/products"
-}
-},
-{
-"name": "Consultar produto por ID",
-"request": {
-"method": "GET",
-"url": "{{base_url}}/products/1"
-}
-},
-{
-"name": "Atualizar produto",
-"request": {
-"method": "PUT",
-"auth": {
-"type": "bearer",
-"bearer": [
-{
-"key": "token",
-"value": "{{token}}",
-"type": "string"
-}
-]
-},
-"header": [
-{
-"key": "Content-Type",
-"value": "application/json"
-}
-],
-"body": {
-"mode": "raw",
-"raw": "{\n  "nome": "Bolo de Rolo Atualizado",\n  "descricao": "Produto típico nordestino atualizado",\n  "preco": 30.0\n}"
-},
-"url": "{{base_url}}/products/1"
-}
-},
-{
-"name": "Remover produto",
-"request": {
-"method": "DELETE",
-"auth": {
-"type": "bearer",
-"bearer": [
-{
-"key": "token",
-"value": "{{token}}",
-"type": "string"
-}
-]
-},
-"url": "{{base_url}}/products/1"
-}
-},
-{
-"name": "Criar pedido",
-"request": {
-"method": "POST",
-"auth": {
-"type": "bearer",
-"bearer": [
-{
-"key": "token",
-"value": "{{token}}",
-"type": "string"
-}
-]
-},
-"header": [
-{
-"key": "Content-Type",
-"value": "application/json"
-}
-],
-"body": {
-"mode": "raw",
-"raw": "{\n  "usuario_id": 1,\n  "produto_id": 1,\n  "quantidade": 2,\n  "canalPedido": "APP"\n}"
-},
-"url": "{{base_url}}/orders"
-}
-},
-{
-"name": "Listar pedidos",
-"request": {
-"method": "GET",
-"url": "{{base_url}}/orders"
-}
-},
-{
-"name": "Filtrar pedidos por canal",
-"request": {
-"method": "GET",
-"url": "{{base_url}}/orders?canalPedido=APP"
-}
-},
-{
-"name": "Consultar pedido por ID",
-"request": {
-"method": "GET",
-"url": "{{base_url}}/orders/1"
-}
-},
-{
-"name": "Pagamento mock aprovado",
-"request": {
-"method": "PUT",
-"auth": {
-"type": "bearer",
-"bearer": [
-{
-"key": "token",
-"value": "{{token}}",
-"type": "string"
-}
-]
-},
-"url": "{{base_url}}/orders/1/pay?aprovado=true"
-}
-},
-{
-"name": "Pagamento mock recusado",
-"request": {
-"method": "PUT",
-"auth": {
-"type": "bearer",
-"bearer": [
-{
-"key": "token",
-"value": "{{token}}",
-"type": "string"
-}
-]
-},
-"url": "{{base_url}}/orders/1/pay?aprovado=false"
-}
-},
-{
-"name": "Produto inexistente - erro 404",
-"request": {
-"method": "GET",
-"url": "{{base_url}}/products/99999"
-}
-},
-{
-"name": "Pedido inexistente - erro 404",
-"request": {
-"method": "GET",
-"url": "{{base_url}}/orders/99999"
-}
-},
-{
-"name": "Pedido com canal inválido - erro 422",
-"request": {
-"method": "POST",
-"auth": {
-"type": "bearer",
-"bearer": [
-{
-"key": "token",
-"value": "{{token}}",
-"type": "string"
-}
-]
-},
-"header": [
-{
-"key": "Content-Type",
-"value": "application/json"
-}
-],
-"body": {
-"mode": "raw",
-"raw": "{\n  "usuario_id": 1,\n  "produto_id": 1,\n  "quantidade": 2,\n  "canalPedido": "6"\n}"
-},
-"url": "{{base_url}}/orders"
-}
-}
-]
+  "info": {
+    "name": "Raízes do Nordeste API",
+    "description": "Coleção Postman da API Raízes do Nordeste.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Home",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/"
+      }
+    },
+    {
+      "name": "Criar usuário",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"nome\":\"Usuario Teste\",\"email\":\"teste@email.com\",\"senha\":\"123456\",\"perfil\":\"CLIENTE\"}"
+        },
+        "url": "{{base_url}}/users"
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "username",
+              "value": "teste@email.com",
+              "type": "text"
+            },
+            {
+              "key": "password",
+              "value": "123456",
+              "type": "text"
+            }
+          ]
+        },
+        "url": "{{base_url}}/login"
+      }
+    },
+    {
+      "name": "Listar produtos",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/products"
+      }
+    },
+    {
+      "name": "Criar produto",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"nome\":\"Bolo de Rolo\",\"descricao\":\"Produto típico nordestino\",\"preco\":25.0}"
+        },
+        "url": "{{base_url}}/products"
+      }
+    },
+    {
+      "name": "Atualizar produto",
+      "request": {
+        "method": "PUT",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"nome\":\"Bolo de Rolo Atualizado\",\"descricao\":\"Produto típico nordestino atualizado\",\"preco\":30.0}"
+        },
+        "url": "{{base_url}}/products/1"
+      }
+    },
+    {
+      "name": "Remover produto",
+      "request": {
+        "method": "DELETE",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{base_url}}/products/1"
+      }
+    },
+    {
+      "name": "Criar pedido",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"usuario_id\":1,\"produto_id\":1,\"quantidade\":2,\"canalPedido\":\"APP\"}"
+        },
+        "url": "{{base_url}}/orders"
+      }
+    },
+    {
+      "name": "Listar pedidos",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/orders"
+      }
+    },
+    {
+      "name": "Filtrar pedidos por canal",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/orders?canalPedido=APP"
+      }
+    },
+    {
+      "name": "Pagamento mock aprovado",
+      "request": {
+        "method": "PUT",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{base_url}}/orders/1/pay?aprovado=true"
+      }
+    },
+    {
+      "name": "Pagamento mock recusado",
+      "request": {
+        "method": "PUT",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{base_url}}/orders/1/pay?aprovado=false"
+      }
+    },
+    {
+      "name": "Produto inexistente - erro 404",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/products/99999"
+      }
+    },
+    {
+      "name": "Pedido inexistente - erro 404",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/orders/99999"
+      }
+    },
+    {
+      "name": "Pedido com canal inválido - erro 422",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"usuario_id\":1,\"produto_id\":1,\"quantidade\":2,\"canalPedido\":\"6\"}"
+        },
+        "url": "{{base_url}}/orders"
+      }
+    }
+  ]
 }
