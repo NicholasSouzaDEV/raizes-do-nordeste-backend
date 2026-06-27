@@ -1,6 +1,10 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from sqlalchemy.orm import Session
+from datetime import datetime, timezone
 from typing import Literal
 
 from app.database.database import (
@@ -75,6 +79,44 @@ app = FastAPI(
     title="Raízes do Nordeste API",
     version="1.0.0"
 )
+
+# ======================================================
+# TRATAMENTO PADRONIZADO DE ERROS
+# ======================================================
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(
+    request: Request,
+    exc: StarletteHTTPException
+):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "erro": True,
+            "status_code": exc.status_code,
+            "mensagem": exc.detail,
+            "path": request.url.path,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: Request,
+    exc: RequestValidationError
+):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "erro": True,
+            "status_code": 422,
+            "mensagem": "Erro de validação dos dados enviados",
+            "detalhes": exc.errors(),
+            "path": request.url.path,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    )
 
 # ======================================================
 # HOME
