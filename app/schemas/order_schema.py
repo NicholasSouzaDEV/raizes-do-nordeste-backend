@@ -1,18 +1,20 @@
 from pydantic import BaseModel
-from typing import Literal
+from enum import Enum
+
+
+class CanalPedido(str, Enum):
+    APP = "APP"
+    TOTEM = "TOTEM"
+    BALCAO = "BALCAO"
+    PICKUP = "PICKUP"
+    WEB = "WEB"
 
 
 class OrderCreate(BaseModel):
     usuario_id: int
     produto_id: int
     quantidade: int
-    canalPedido: Literal[
-        "APP",
-        "TOTEM",
-        "BALCAO",
-        "PICKUP",
-        "WEB"
-    ]
+    canalPedido: CanalPedido
 
 
 class OrderResponse(BaseModel):
@@ -22,7 +24,7 @@ class OrderResponse(BaseModel):
     quantidade: int
     total: float
     status: str
-    canalPedido: str
+    canalPedido: CanalPedido
 
     class Config:
         from_attributes = True

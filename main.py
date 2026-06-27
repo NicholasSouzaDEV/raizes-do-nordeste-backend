@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from typing import Literal
 
 from app.database.database import (
     engine,
@@ -31,7 +32,8 @@ from app.schemas.product_schema import (
 
 from app.schemas.order_schema import (
     OrderCreate,
-    OrderResponse
+    OrderResponse,
+    CanalPedido
 )
 
 # ==========================
@@ -233,7 +235,7 @@ def create_new_order(
     order.usuario_id,
     order.produto_id,
     order.quantidade,
-    order.canalPedido
+    order.canalPedido.value
 )
 
 
@@ -242,12 +244,12 @@ def create_new_order(
     response_model=list[OrderResponse]
 )
 def list_orders(
-    canalPedido: str | None = None,
+    canalPedido: CanalPedido | None = None,
     db: Session = Depends(get_db)
 ):
     return get_orders(
         db,
-        canalPedido
+        canalPedido.value if canalPedido else None
     )
 
 
